@@ -105,5 +105,6 @@ jobs:
     - name: Upload CodeQL Analysis
       uses: actions/upload-artifact@v6
       with:
+        name: ${{ matrix.language }}-${{ matrix.build-mode }}-sarif
         path: ${{runner.workspace}}/results/*.sarif
         
