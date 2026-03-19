@@ -1,0 +1,10 @@
+# .NET build output
+csharp/**/bin/
+csharp/**/obj/
+
+# Node.js
+js/node_modules/
+
+# Go binaries
+go/*.exe
+go/pathinjection-demo
