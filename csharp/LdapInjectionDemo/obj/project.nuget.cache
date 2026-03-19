@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "sffa8K6QTQM=",
+  "success": true,
+  "projectFilePath": "/home/runner/work/demo-autofix/demo-autofix/csharp/LdapInjectionDemo/LdapInjectionDemo.csproj",
+  "expectedPackageFiles": [
+    "/home/runner/.nuget/packages/system.directoryservices/9.0.4/system.directoryservices.9.0.4.nupkg.sha512"
+  ],
+  "logs": []
+}
