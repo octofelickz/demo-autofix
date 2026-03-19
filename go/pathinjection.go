@@ -6,7 +6,10 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 )
+
+const safeDir = "/home/user/"
 
 func handler(w http.ResponseWriter, r *http.Request) {
 	pathParam := r.URL.Query().Get("path")
@@ -15,8 +18,18 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// BAD: This could read any file on the file system
-	data, err := os.ReadFile(pathParam)
+	// GOOD: ensure that the resolved path is within the safe directory
+	absPath, err := filepath.Abs(filepath.Join(safeDir, pathParam))
+	if err != nil {
+		http.Error(w, "Invalid file path", http.StatusBadRequest)
+		return
+	}
+	rel, relErr := filepath.Rel(safeDir, absPath)
+	if relErr != nil || strings.HasPrefix(rel, "..") {
+		http.Error(w, "Invalid file path", http.StatusBadRequest)
+		return
+	}
+	data, err := os.ReadFile(absPath)
 	if err != nil {
 		http.Error(w, "Error reading file: "+err.Error(), http.StatusInternalServerError)
 		return
@@ -31,8 +44,18 @@ func handlerJoin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// BAD: This could still read any file on the file system
-	data, err := os.ReadFile(filepath.Join("/home/user/", pathParam))
+	// GOOD: ensure that the resolved path is within the safe directory
+	absPath, err := filepath.Abs(filepath.Join(safeDir, pathParam))
+	if err != nil {
+		http.Error(w, "Invalid file path", http.StatusBadRequest)
+		return
+	}
+	rel, relErr := filepath.Rel(safeDir, absPath)
+	if relErr != nil || strings.HasPrefix(rel, "..") {
+		http.Error(w, "Invalid file path", http.StatusBadRequest)
+		return
+	}
+	data, err := os.ReadFile(absPath)
 	if err != nil {
 		http.Error(w, "Error reading file: "+err.Error(), http.StatusInternalServerError)
 		return
