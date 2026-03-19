@@ -4,8 +4,13 @@ var http = require("http");
 var app = express();
 
 app.get("/fetch", function (req, res) {
-    // BAD: `target` is controlled by the attacker (SSRF)
-    http.get("http://" + req.query.target + ".example.com/data/", function (response) {
+    var target = req.query.target;
+    // GOOD: validate `target` contains only safe subdomain characters
+    if (!target || !/^[a-zA-Z0-9-]+$/.test(target)) {
+        res.status(400).send("Invalid target parameter");
+        return;
+    }
+    http.get("http://" + target + ".example.com/data/", function (response) {
         var body = "";
         response.on("data", function (chunk) { body += chunk; });
         response.on("end", function () {
