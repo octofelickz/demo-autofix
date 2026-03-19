@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Demo app showing SSRF vulnerability",
   "main": "ssrf.js",
-  "type": "module",
   "scripts": {
     "start": "node ssrf.js"
   }

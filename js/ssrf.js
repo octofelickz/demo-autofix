@@ -1,40 +1,30 @@
-import http from 'http';
+var http = require("http");
+var url = require("url");
 
-const server = http.createServer(function(req, res) {
-    const url = new URL(req.url, "http://localhost:3000");
+var server = http.createServer(function (req, res) {
+    var queryData = url.parse(req.url, true).query;
 
-    if (url.pathname === "/fetch") {
-        const target = url.searchParams.get("target");
-
-        if (!target) {
-            res.writeHead(400, { "Content-Type": "text/plain" });
-            res.end("Missing 'target' query parameter");
-            return;
-        }
-
+    if (queryData.target) {
         // BAD: `target` is controlled by the attacker
-        const fetchUrl = 'http://' + target + ".example.com/data/";
-        console.log("Fetching:", fetchUrl);
+        var fetchUrl = "http://" + queryData.target + ".example.com/data/";
 
-        http.get(fetchUrl, (upstream) => {
-            let body = '';
-            upstream.on('data', chunk => body += chunk);
-            upstream.on('end', () => {
+        http.get(fetchUrl, function (upstream) {
+            var body = "";
+            upstream.on("data", function (chunk) { body += chunk; });
+            upstream.on("end", function () {
                 res.writeHead(200, { "Content-Type": "text/plain" });
                 res.end("Response from upstream: " + body);
             });
-        }).on('error', (err) => {
+        }).on("error", function (err) {
             res.writeHead(502, { "Content-Type": "text/plain" });
             res.end("Upstream error: " + err.message);
         });
     } else {
         res.writeHead(200, { "Content-Type": "text/plain" });
-        res.end("SSRF Demo Server. Try GET /fetch?target=somehost");
+        res.end("SSRF Demo Server.\nTry: GET /?target=somehost\n");
     }
 });
 
-const PORT = 3000;
-server.listen(PORT, () => {
-    console.log(`SSRF demo server listening on http://localhost:${PORT}`);
-    console.log(`Try: http://localhost:${PORT}/fetch?target=somehost`);
+server.listen(3000, function () {
+    console.log("SSRF demo server listening on http://localhost:3000");
 });
